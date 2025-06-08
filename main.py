@@ -44,7 +44,7 @@ def is_user_joined(user_id):
 @bot.message_handler(commands=["start"])
 def start(message):
     markup = telebot.types.InlineKeyboardMarkup()
-    join_btn = telebot.types.InlineKeyboardButton("➕ Join Group", url="https://t.me/YourGroupUsername")  # ⬅️ Replace
+    join_btn = telebot.types.InlineKeyboardButton("➕ Join Group", url="https://t.me/FOREVERFRANDS")  # ⬅️ Replace
     markup.add(join_btn)
 
     bot.send_message(
