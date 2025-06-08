@@ -12,7 +12,7 @@ app = Flask(__name__)
 # 📂 Hosted JSON file
 JSON_URL = "https://sudeepnew123.github.io/Anime-provideer-/anime.json"
 GROUP_CHAT_ID = -1002302837596
-WEBHOOK_URL = "https://your-render-name.onrender.com"  # Replace with your Render domain
+WEBHOOK_URL = "https://anime22.onrender.com"  # Replace with your Render domain
 LOG_FILE = "downloads.json"
 
 def get_anime_data():
