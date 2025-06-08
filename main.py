@@ -2,6 +2,7 @@ import telebot
 import requests
 import json
 import os
+import threading
 from flask import Flask, request
 
 # ✅ Secure bot token from environment
@@ -11,7 +12,6 @@ app = Flask(__name__)
 
 # 📂 Hosted JSON file
 JSON_URL = "https://sudeepnew123.github.io/Anime-provideer-/anime.json"
-GROUP_CHAT_ID = -1002302837596
 WEBHOOK_URL = "https://anime22.onrender.com"  # Replace with your Render domain
 LOG_FILE = "downloads.json"
 
@@ -34,13 +34,6 @@ def log_user_download(anime_name, username):
     with open(LOG_FILE, "w") as f:
         json.dump(logs, f, indent=2)
 
-def is_user_joined(user_id):
-    try:
-        status = bot.get_chat_member(GROUP_CHAT_ID, user_id).status
-        return status in ["member", "administrator", "creator"]
-    except:
-        return False
-
 @bot.message_handler(commands=["start"])
 def start(message):
     markup = telebot.types.InlineKeyboardMarkup()
@@ -52,13 +45,18 @@ def start(message):
         reply_markup=markup
     )
 
+    # 🕒 10 seconds later, send thank you message
+    def send_thank_you():
+        import time
+        time.sleep(10)
+        bot.send_message(message.chat.id, "✅ Thanks for joining! Now please send the anime name you want.")
+
+    threading.Thread(target=send_thank_you).start()
+
 @bot.message_handler(func=lambda m: True)
 def handle_query(message):
     user_id = message.from_user.id
     username = message.from_user.username or f"id:{user_id}"
-    if not is_user_joined(user_id):
-        bot.send_message(message.chat.id, "❌ Please join the group first to access anime content.")
-        return
 
     query = message.text.strip().lower()
     data = get_anime_data()
