@@ -37,61 +37,55 @@ def log_user_download(anime_name, username):
 @bot.message_handler(commands=["start"])
 def start(message):
     user_id = message.from_user.id
-    chat_id = message.chat.id
-    first_name = message.from_user.first_name or ""
     username = message.from_user.username or f"id:{user_id}"
+    full_name = message.from_user.first_name
 
-    # 🔘 Join button
+    # 🧷 Inline Button
     markup = telebot.types.InlineKeyboardMarkup()
     join_btn = telebot.types.InlineKeyboardButton("➕ Join Group", url="https://t.me/FOREVERFRANDS")
     markup.add(join_btn)
 
-    welcome_msg = bot.send_message(
-        chat_id,
+    # 📤 Start Message
+    sent = bot.send_message(
+        message.chat.id,
         "👋 Welcome to Anime Provider Bot!\n\n📥 To access anime links, please join our group first.",
         reply_markup=markup
     )
 
-    # 🕒 After 10 seconds, thank you message
-    def send_thank_and_delete():
+    # ✅ Thank You Message after 10 sec
+    def send_thank_you():
         import time
         time.sleep(10)
-        thank_msg = bot.send_message(
-            chat_id,
-            "✅ Thanks for joining! Now please send the anime name you want."
-        )
-
-        # 🗑️ Delete both messages after 2 minutes
-        time.sleep(110)  # 10 + 110 = 120 (2 min)
+        thank = bot.send_message(message.chat.id, "✅ Thanks for joining! Now please send the anime name you want.")
+        
+        # 🧹 Delete after 2 mins
+        time.sleep(110)
         try:
-            bot.delete_message(chat_id, welcome_msg.message_id)
-            bot.delete_message(chat_id, thank_msg.message_id)
+            bot.delete_message(message.chat.id, thank.message_id)
+            bot.delete_message(message.chat.id, sent.message_id)
         except:
             pass
 
-    threading.Thread(target=send_thank_and_delete).start()
+    threading.Thread(target=send_thank_you).start()
 
-    # 📣 Send message to GC
-    try:
-        group_msg = bot.send_message(
-            -1002302837596,  # ✅ Replace with your group chat ID
-            f"<b>🚀 {first_name} (@{username}) just started the Anime Bot!</b>",
-            parse_mode="HTML"
-        )
+    # 📣 GC broadcast message
+    gc_msg = bot.send_message(
+        -1002302837596,  # Replace with your GC ID
+        f"🔔 <b>{full_name}</b> (<code>@{username}</code>) has started the bot!",
+        parse_mode="HTML"
+    )
 
-        # 🗑️ Delete GC message after 2 min
-        def delete_group_msg():
-            import time
-            time.sleep(120)
-            try:
-                bot.delete_message(-1002302837596, group_msg.message_id)
-            except:
-                pass
+    # 🧹 Delete GC message after 2 minutes
+    def delete_gc_msg():
+        import time
+        time.sleep(120)
+        try:
+            bot.delete_message(-1002302837596, gc_msg.message_id)
+        except:
+            pass
 
-        threading.Thread(target=delete_group_msg).start()
-    except:
-        pass  # In case bot is not in group or no permission
-
+    threading.Thread(target=delete_gc_msg).start()
+    
 @bot.message_handler(func=lambda m: True)
 def handle_query(message):
     user_id = message.from_user.id
