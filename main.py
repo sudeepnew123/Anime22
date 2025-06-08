@@ -39,15 +39,32 @@ def start(message):
     markup = telebot.types.InlineKeyboardMarkup()
     join_btn = telebot.types.InlineKeyboardButton("➕ Join Group", url="https://t.me/FOREVERFRANDS")
     markup.add(join_btn)
+
     bot.send_message(
         message.chat.id,
         "👋 Welcome to Anime Provider Bot!\n\n📥 To access anime links, please join our group first.",
         reply_markup=markup
     )
 
-    # 🕒 10 seconds later, send thank you message
+    # 💬 Group announcement
+    try:
+        name = message.from_user.first_name
+        username = f"@{message.from_user.username}" if message.from_user.username else name
+        text = f"✨ <b>{username}</b> ne <b>Anime Bot</b> start kiya hai!"
+        sent = bot.send_message(GROUP_CHAT_ID, text, parse_mode='HTML')
+
+        # 🧽 Auto-delete after 2 min
+        import threading, time
+        def delete_announcement():
+            time.sleep(120)
+            bot.delete_message(GROUP_CHAT_ID, sent.message_id)
+        threading.Thread(target=delete_announcement).start()
+
+    except Exception as e:
+        print("Failed to send to GC:", e)
+
+    # 🕒 Thank-you message after 10s
     def send_thank_you():
-        import time
         time.sleep(10)
         bot.send_message(message.chat.id, "✅ Thanks for joining! Now please send the anime name you want.")
 
