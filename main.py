@@ -40,17 +40,30 @@ def is_user_joined(user_id):
         return status in ["member", "administrator", "creator"]
     except:
         return False
-
+        
 @bot.message_handler(commands=["start"])
 def start(message):
     markup = telebot.types.InlineKeyboardMarkup()
-    join_btn = telebot.types.InlineKeyboardButton("➕ Join Group", url="https://t.me/YourGroupUsername")
+    join_btn = telebot.types.InlineKeyboardButton("➕ Join Group", url="https://t.me/YourGroupUsername")  # ⬅️ Replace
     markup.add(join_btn)
+
     bot.send_message(
         message.chat.id,
         "👋 Welcome to Anime Provider Bot!\n\n📥 To access anime links, please join our group first.",
         reply_markup=markup
     )
+
+    # Wait 5 seconds and then send thank you message
+    import threading
+    def send_thankyou():
+        import time
+        time.sleep(5)
+        bot.send_message(
+            message.chat.id,
+            "✅ Thanks for joining! Now please send the anime name you want."
+        )
+
+    threading.Thread(target=send_thankyou).start()
 
 @bot.message_handler(func=lambda m: True)
 def handle_query(message):
