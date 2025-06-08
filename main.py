@@ -65,12 +65,28 @@ def handle_query(message):
         if query in anime_id.lower() or any(query in kw.lower() for kw in anime.get("keywords", [])):
             text = f"🎬 <b>{anime['title']}</b>\n📝 {anime['desc']}\n\n" \
                    f"📥 <a href='{anime['link_480p']}'>480p</a> | <a href='{anime['link_720p']}'>720p</a>"
-            bot.send_message(message.chat.id, text, parse_mode='HTML', disable_web_page_preview=True)
+
+            # 👇 Send photo if available
+            if "thumb" in anime:
+                bot.send_photo(
+                    message.chat.id,
+                    photo=anime["thumb"],
+                    caption=text,
+                    parse_mode='HTML'
+                )
+            else:
+                bot.send_message(
+                    message.chat.id,
+                    text,
+                    parse_mode='HTML',
+                    disable_web_page_preview=True
+                )
+
             log_user_download(anime_id, f"@{username}")
             return
 
     bot.send_message(message.chat.id, "❌ Sorry, anime not found. Try another name.")
-
+    
 @app.route("/", methods=["POST"])
 def receive_update():
     update = telebot.types.Update.de_json(request.stream.read().decode("utf-8"))
